@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  parties.xml — Custom party templates for BannerlordCoop.
+  Currently empty. Add <PartyTemplate> entries here to define party
+  compositions used by co-op peer parties or test spawns.
+  Reference: Mount & Blade II Bannerlord/Modules/SandBox/ModuleData/parties.xml
+-->
+<PartyTemplates/>

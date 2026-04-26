@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  spnpccharacters.xml — NPC character templates for BannerlordCoop.
+  Currently empty. Add <NPCCharacter> entries here to define custom
+  companion archetypes or test heroes for co-op sessions.
+  The engine merges this with SandBox's spnpccharacters.xml at startup.
+  Reference: Mount & Blade II Bannerlord/Modules/SandBox/ModuleData/spnpccharacters.xml
+-->
+<NPCCharacters/>

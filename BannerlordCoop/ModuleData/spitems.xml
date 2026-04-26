@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  spitems.xml — Custom item definitions for BannerlordCoop.
+  Currently empty. Add <Item> entries here to introduce custom weapons,
+  armour, or equipment that ships with the co-op mod (e.g. debug kits).
+  The engine merges this file with Native's spitems.xml at startup.
+  Reference: Mount & Blade II Bannerlord/Modules/Native/ModuleData/spitems.xml
+-->
+<Items/>

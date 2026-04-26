@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  strings.xml — English localization strings for BannerlordCoop.
+  The engine looks up string IDs at runtime via GameTexts.FindText("str_id").
+  Add entries here for any UI labels, tooltips, or prompts that should be
+  translatable. Mirror this file under Localization/<LANG_CODE>/strings.xml
+  to add additional language support.
+
+  Format:
+    <string id="str_unique_id" text="Displayed text here"/>
+
+  Usage in C#:
+    GameTexts.FindText("str_coop_join_battle").ToString()
+-->
+<strings>
+
+  <!-- ── Main Menu ─────────────────────────────────────────────────── -->
+  <string id="str_coop_menu_button"         text="Co-op"/>
+  <string id="str_coop_lobby_title"         text="BannerlordCoop Lobby"/>
+
+  <!-- ── Lobby Screen ──────────────────────────────────────────────── -->
+  <string id="str_coop_host_game"           text="Host Game"/>
+  <string id="str_coop_join_game"           text="Join Game"/>
+  <string id="str_coop_disconnect"          text="Disconnect"/>
+  <string id="str_coop_status_idle"         text="Not connected"/>
+  <string id="str_coop_status_hosting"      text="Hosting — waiting for players…"/>
+  <string id="str_coop_status_connected"    text="Connected to host"/>
+  <string id="str_coop_status_connecting"   text="Connecting…"/>
+
+  <!-- ── Battle / Campaign Prompts ─────────────────────────────────── -->
+  <string id="str_coop_join_battle"         text="Join Battle"/>
+  <string id="str_coop_battle_started"      text="A co-op battle has started. Join now?"/>
+  <string id="str_coop_desync_warning"      text="[BannerlordCoop] Desync detected. Attempting to resync…"/>
+  <string id="str_coop_desync_fatal"        text="[BannerlordCoop] Fatal desync — please reload the save."/>
+
+  <!-- ── Settings (MCM labels) ─────────────────────────────────────── -->
+  <string id="str_coop_settings_group"      text="BannerlordCoop"/>
+  <string id="str_coop_settings_port"       text="Host Port"/>
+  <string id="str_coop_settings_port_hint"  text="UDP port the host listens on (default 7777)."/>
+  <string id="str_coop_settings_sync_ms"    text="Sync Interval (ms)"/>
+  <string id="str_coop_settings_sync_hint"  text="How often campaign state is broadcast to clients."/>
+
+  <!-- ── General Notifications ─────────────────────────────────────── -->
+  <string id="str_coop_player_joined"       text="{PLAYER_NAME} has joined the session."/>
+  <string id="str_coop_player_left"         text="{PLAYER_NAME} has left the session."/>
+  <string id="str_coop_mod_loaded"          text="[BannerlordCoop] Mod loaded. Press F10 to open the lobby."/>
+
+</strings>
