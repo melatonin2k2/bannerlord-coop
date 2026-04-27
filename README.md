@@ -2,7 +2,7 @@
 
 Lets multiple players play the singleplayer campaign together over LAN.
 Each player controls their own hero/party and can trade, fight, recruit, and
-build their kingdom as normal — on the **same living world** that updates for
+build their kingdom as normal on the **same living world** that updates for
 everyone in real time.
 
 ---
@@ -75,7 +75,7 @@ Download and copy these into the `lib/` folder before building:
 
 | File | Source |
 |---|---|
-| `0Harmony.dll` | [Bannerlord.Harmony NexusMods](https://www.nexusmods.com/mountandblade2bannerlord/mods/2006) or NuGet `Lib.Harmony` |
+| `0Harmony.dll` | [Bannerlord.Harmony NexusMods](https://www.nexusmods.com/mountandblade2bannerlord/mods/2006) |
 | `LiteNetLib.dll` | [LiteNetLib GitHub releases](https://github.com/RevenantX/LiteNetLib/releases) |
 
 ### Build steps
