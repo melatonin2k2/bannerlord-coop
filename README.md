@@ -2,7 +2,7 @@
 
 Lets multiple players play the singleplayer campaign together over LAN.
 Each player controls their own hero/party and can trade, fight, recruit, and
-build their kingdom as normal on the **same living world** that updates for
+build their kingdom as normal — on the **same living world** that updates for
 everyone in real time.
 
 ---
@@ -75,7 +75,7 @@ Download and copy these into the `lib/` folder before building:
 
 | File | Source |
 |---|---|
-| `0Harmony.dll` | [Bannerlord.Harmony NexusMods](https://www.nexusmods.com/mountandblade2bannerlord/mods/2006) |
+| `0Harmony.dll` | [Bannerlord.Harmony NexusMods](https://www.nexusmods.com/mountandblade2bannerlord/mods/2006) or NuGet `Lib.Harmony` |
 | `LiteNetLib.dll` | [LiteNetLib GitHub releases](https://github.com/RevenantX/LiteNetLib/releases) |
 
 ### Build steps
@@ -126,7 +126,10 @@ The post-build target automatically copies the output to:
 6. The campaign loads automatically — you are now in the shared world.
 
 ### In-game chat
-Type `/` to open a chat input (future UI; currently messages appear in the info log).
+Press **T** to open a chat input. Press **~** (tilde / backtick) to toggle the
+persistent chat panel. Slash commands are also routed through the input:
+`/trade`, `/buyworkshop`, `/foundcaravan`, `/siege`, `/joinbattle`, `/defend`,
+`/flee`.
 
 ### Disconnect
 Press **F10** → **Disconnect** (or close the game).
@@ -151,9 +154,20 @@ Press **F10** → **Disconnect** (or close the game).
 | `RequestMove` | C→S | Reliable | Move player party to position |
 | `RequestEnterSettlement` | C→S | Reliable | Enter town/castle/village |
 | `RequestAttack` | C→S | Reliable | Attack another party |
-| `RequestTrade` | C→S | Reliable | Trade item with settlement |
+| `RequestTrade` | C→S | Reliable | Acquire merchant lock for trade screen |
+| `RequestTradeApply` | C→S | Reliable | Submit a content-validated trade transaction |
 | `RequestRecruit` | C→S | Reliable | Recruit troops |
 | `RequestDiplomacy` | C→S | Reliable | Diplomacy action |
+| `RequestPurchaseWorkshop` | C→S | Reliable | Buy a workshop in a settlement |
+| `RequestFoundCaravan` | C→S | Reliable | Found a caravan led by a companion |
+| `RequestSiegeAction` | C→S | Reliable | Drive siege menu (build engine / tactic / storm / sally) |
+| `BattleJoinOffer` | S→C | Reliable | Adjacent peer invited to a joint battle |
+| `BattleJoinResponse` | C→S | Reliable | Reply to `BattleJoinOffer` (Ally/Opp/Decline) |
+| `BattleUpgradedToJoint` | S→C | Reliable | Battle promoted to a shared joint mission |
+| `JointBattleLootAssigned` | S→C | Reliable | Per-participant loot/gold/prisoner allocation |
+| `AgentStateBatch` | P↔P | Unreliable | 30 Hz battle-host → guests agent state stream |
+| `HeroInputBatch` | P↔P | Reliable | Guest → battle-host hero input frame stream |
+| `AgentDeath` | P↔P | Reliable | Authoritative agent death from battle-host |
 | `ChatMessage` | Both | Reliable | In-game chat |
 | `FileTransferBegin` | S→C | Reliable | Save-file header |
 | `FileChunk` | S→C | Reliable | 64 KB save-file chunk |
@@ -163,33 +177,58 @@ Press **F10** → **Disconnect** (or close the game).
 
 ## Known Limitations & Roadmap
 
-- **Battles**: Client battles currently rely on Bannerlord's local simulation.
-  A future version will synchronise battle results through the host.
+- **Battles**: Solo battles resolve locally on the participating peer and
+  broadcast the result; joint battles (host + adjacent peers within a 64-unit
+  coalesce radius) enter a shared mission with battle-host authority over
+  agent state, hero input, and damage. Outcomes reconcile at the campaign
+  host, with the battle-host's report canonical.
 
-- **Inventory sync**: Item prices and trade profits sync via world-state but
-  detailed inventory is not yet streamed. Client trade is optimistically applied.
+- **Inventory & trade**: Item rosters sync host→client via hourly
+  `InventoryDelta`/`RosterUpdate`. Trade transactions are content-validated
+  by the host (`RequestTradeApply`): the client sends the proposed
+  `(item, count, side, price)` lines via the `/trade` slash command; the host
+  validates funds and stock atomically and confirms or toasts a rejection.
 
-- **Multiple clans**: Each client controls their own clan. Clan-level economies
-  (workshops, caravans) are not yet individually synced.
+- **Multiple clans / clan economies**: Each client controls their own clan.
+  Workshops and caravans sync host→client (`WorkshopUpdate` / `CaravanUpdate`).
+  Clients can buy workshops and found caravans via the `/buyworkshop` and
+  `/foundcaravan` slash commands (host validates clan funds, ownership, and
+  faction relations); a proper menu integration is a planned follow-up.
 
-- **Save on client**: Clients can save their own state; the save will include
-  the full world state as of the last sync.
+- **Save on client**: Clients can save their own state. The save includes
+  the full world state as of the last sync. Host-pushed saves load via
+  `MBSaveLoad → SandBoxGameManager → MBGameManager.StartNewGame`.
 
-- **Chat UI**: Currently uses the info log overlay. A proper in-game chat box
-  is planned for the next milestone.
+- **Chat UI**: Persistent in-game chat panel (`CoopChatPanel`, Gauntlet-based)
+  with `InformationManager` overlay fallback. The Gauntlet movie XML is not
+  yet shipped — the panel is wired and renders silently in `try/catch` until
+  the layout drops in; chat lines remain visible via the overlay fallback.
+  Toggle visibility with the `~` (tilde / backtick) key; `T` opens the inline
+  input.
 
-- **Siege UI**: Siege management menus work on the host. Client siege
-  participation is proxied through the host.
+- **Siege**: Siege battles flow through the joint-battle path (the 64-unit
+  coalesce rule covers besieger leader and garrison co-located at the
+  settlement). Siege management actions (build engines, assign tactic, wait,
+  pull back, storm, sally out) are proxied to the host via the
+  `/siege <action> <partyId> <settlementId> [arg]` slash command and
+  `RequestSiegeAction` packet. Some apply paths (engine construction, tactic
+  assignment, storm, sally) probe Bannerlord 1.3.15 internals via reflection
+  and may reject as "unsupported on this build" if the surface differs;
+  pull-back and wait are universally supported.
 
 ---
 
 ## Contributing
 
 PRs welcome. Key areas needing work:
-- Full Gauntlet UI panel replacing the InquiryData dialogs
-- Battle result synchronisation
-- Caravan / workshop sync per player
-- Support for more than 2 players (tested with 2, designed for up to 8)
+- `CoopChatPanel.xml` Gauntlet movie file (the C# wiring is shipped; the
+  layout is the missing piece — until then the chat panel falls back to the
+  `InformationManager` overlay).
+- Replacing slash commands with proper menu integration for `/trade`,
+  `/buyworkshop`, `/foundcaravan`, and `/siege`.
+- Full Bannerlord 1.3.15 surface coverage for the reflection-probed siege
+  apply helpers (engine construction, tactic assignment, storm, sally).
+- Support for more than 2 players (tested with 2, designed for up to 8).
 
 ---
 
