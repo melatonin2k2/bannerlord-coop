@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Prefab>
+  <Constants />
+  <VisualDefinitions />
+  <Window>
+    <Widget WidthSizePolicy="Fixed"
+            HeightSizePolicy="Fixed"
+            SuggestedWidth="540"
+            SuggestedHeight="240"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            MarginLeft="20"
+            MarginBottom="20"
+            IsVisible="@IsOpen">
+      <Children>
+        <!-- Background panel -->
+        <ImageWidget WidthSizePolicy="StretchToParent"
+                     HeightSizePolicy="StretchToParent"
+                     Brush="CoopChat.Background"
+                     Color="#000000B4" />
+
+        <!-- Scrollable list of chat lines -->
+        <ScrollablePanel WidthSizePolicy="StretchToParent"
+                         HeightSizePolicy="Fixed"
+                         SuggestedHeight="200"
+                         AutoHideScrollBars="false"
+                         ClipContents="true"
+                         MarginTop="6"
+                         MarginLeft="6"
+                         MarginRight="6">
+          <Children>
+            <ListPanel WidthSizePolicy="StretchToParent"
+                       HeightSizePolicy="CoverChildren"
+                       StackLayout.LayoutMethod="VerticalBottomToTop"
+                       VerticalAlignment="Bottom"
+                       DataSource="{Lines}">
+              <ItemTemplate>
+                <Widget WidthSizePolicy="StretchToParent"
+                        HeightSizePolicy="CoverChildren"
+                        MarginTop="2">
+                  <Children>
+                    <RichTextWidget WidthSizePolicy="StretchToParent"
+                                    HeightSizePolicy="CoverChildren"
+                                    Text="@Text"
+                                    Brush="CoopChat.Line" />
+                  </Children>
+                </Widget>
+              </ItemTemplate>
+            </ListPanel>
+          </Children>
+        </ScrollablePanel>
+
+        <!-- Input field -->
+        <EditableTextWidget WidthSizePolicy="StretchToParent"
+                            HeightSizePolicy="Fixed"
+                            SuggestedHeight="28"
+                            VerticalAlignment="Bottom"
+                            MarginBottom="4"
+                            MarginLeft="6"
+                            MarginRight="6"
+                            Brush="CoopChat.Input"
+                            Text="@Input"
+                            MaxLength="200" />
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

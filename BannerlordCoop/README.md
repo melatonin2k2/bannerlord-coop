@@ -185,50 +185,51 @@ Press **F10** → **Disconnect** (or close the game).
 
 - **Inventory & trade**: Item rosters sync host→client via hourly
   `InventoryDelta`/`RosterUpdate`. Trade transactions are content-validated
-  by the host (`RequestTradeApply`): the client sends the proposed
-  `(item, count, side, price)` lines via the `/trade` slash command; the host
-  validates funds and stock atomically and confirms or toasts a rejection.
+  by the host: when the player closes the inventory/trade screen, a
+  Harmony postfix captures the net diff (item counts + gold delta), submits
+  it as a `RequestTradeApply`, and rolls the screen back if the host rejects.
 
 - **Multiple clans / clan economies**: Each client controls their own clan.
   Workshops and caravans sync host→client (`WorkshopUpdate` / `CaravanUpdate`).
-  Clients can buy workshops and found caravans via the `/buyworkshop` and
-  `/foundcaravan` slash commands (host validates clan funds, ownership, and
-  faction relations); a proper menu integration is a planned follow-up.
+  Clients buy workshops and found caravans through the **vanilla town
+  menus**; menu interceptors swap each option's consequence on clients to
+  send `RequestPurchaseWorkshop` / `RequestFoundCaravan` (host validates
+  clan funds, ownership, and faction relations).
 
 - **Save on client**: Clients can save their own state. The save includes
   the full world state as of the last sync. Host-pushed saves load via
   `MBSaveLoad → SandBoxGameManager → MBGameManager.StartNewGame`.
 
 - **Chat UI**: Persistent in-game chat panel (`CoopChatPanel`, Gauntlet-based)
-  with `InformationManager` overlay fallback. The Gauntlet movie XML is not
-  yet shipped — the panel is wired and renders silently in `try/catch` until
-  the layout drops in; chat lines remain visible via the overlay fallback.
-  Toggle visibility with the `~` (tilde / backtick) key; `T` opens the inline
-  input.
+  at the bottom-left of the map screen, with `InformationManager` overlay
+  always echoing for accessibility. Toggle visibility with `~` (tilde /
+  backtick); `T` opens the inline input.
 
 - **Siege**: Siege battles flow through the joint-battle path (the 64-unit
   coalesce rule covers besieger leader and garrison co-located at the
-  settlement). Siege management actions (build engines, assign tactic, wait,
-  pull back, storm, sally out) are proxied to the host via the
-  `/siege <action> <partyId> <settlementId> [arg]` slash command and
-  `RequestSiegeAction` packet. Some apply paths (engine construction, tactic
-  assignment, storm, sally) probe Bannerlord 1.3.15 internals via reflection
-  and may reject as "unsupported on this build" if the surface differs;
-  pull-back and wait are universally supported.
+  settlement). Siege management is driven from the **vanilla siege menu**
+  on clients; consequence-swap interceptors send `RequestSiegeAction` for
+  each option (storm, pull back, sally out). Host-side apply uses a chain
+  of reflection probes against 1.3.15 internals — sally-out binds via
+  `SallyOutsCampaignBehavior.CheckForSettlementSallyOut`, build-engine
+  via `BesiegerCamp.AddNewSiegeEngineFromType`, etc. If every probe in a
+  chain misses for an action, that action rejects with "unsupported on
+  this build"; pull-back and wait are universally supported.
 
 ---
 
 ## Contributing
 
 PRs welcome. Key areas needing work:
-- `CoopChatPanel.xml` Gauntlet movie file (the C# wiring is shipped; the
-  layout is the missing piece — until then the chat panel falls back to the
-  `InformationManager` overlay).
-- Replacing slash commands with proper menu integration for `/trade`,
-  `/buyworkshop`, `/foundcaravan`, and `/siege`.
-- Full Bannerlord 1.3.15 surface coverage for the reflection-probed siege
-  apply helpers (engine construction, tactic assignment, storm, sally).
+- Sub-menu interception for siege engine type and tactic selection
+  (currently the top-level `BuildEngine` / `AssignTactic` siege menu options
+  are skipped on clients pending native sub-menu support; a `CoopMod.Debug`-
+  gated `/siege` slash command remains as a dev fallback).
 - Support for more than 2 players (tested with 2, designed for up to 8).
+- Cross-validating workshop / caravan menu option ids against more 1.3.x
+  point releases — the current intercepts probe `town_workshops` and
+  `town_companion_caravan_select`; alternative ids on community forks may
+  need to be added.
 
 ---
 

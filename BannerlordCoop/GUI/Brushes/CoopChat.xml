@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BrushList>
+
+  <Brush Name="CoopChat.Background">
+    <Layers>
+      <Layer Sprite="StdAssets\white_dot" Color="#000000B4" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="CoopChat.Line"
+         Font="GameFont_Default"
+         FontSize="18"
+         TextColor="#FFFFFFFF"
+         FontVerticalAlignment="Center"
+         FontHorizontalAlignment="Left" />
+
+  <Brush Name="CoopChat.Input"
+         Font="GameFont_Default"
+         FontSize="16"
+         TextColor="#FFFFFFFF">
+    <Layers>
+      <Layer Sprite="StdAssets\white_dot" Color="#222222FF" />
+    </Layers>
+  </Brush>
+
+</BrushList>
